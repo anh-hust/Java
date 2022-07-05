@@ -68,12 +68,31 @@ public class test extends Backend {
 
         try {
             Backend backEnd = new Backend();
-//            ArrayList<ArrayList<String>> pb = backEnd.thong_tin_phong_ban("pb003");
-            ArrayList<ArrayList<String>> nv = backEnd.thong_tin_nhan_vien("nv151");
-            for (int i = 0; i < nv.size(); i++) {
-                for (int j = 0; j < nv.get(i).size(); j++) {
-                    System.out.println(nv.get(i).get(j));
+//            ArrayList<ArrayList<Object>> pb = backEnd.thong_tin_phong_ban("pb003");
+//            ArrayList<ArrayList<String>> nv = backEnd.thong_tin_nhan_vien("nv151");
+//            ArrayList<ArrayList<Object>> cv = backEnd.thong_tin_chuc_vu("cv012");
+            ArrayList<ArrayList<Object>> luong = backEnd.thong_tin_luong("nv100");
+//            for (int i = 0; i < nv.size(); i++) {
+//                for (int j = 0; j < nv.get(i).size(); j++) {
+//                    System.out.println(nv.get(i).get(j));
+//                }
+//            }
+//            for (int i = 0; i < pb.size(); i++) {
+//                for (int j = 0; j < pb.get(i).size(); j++) {
+//                    System.out.println(pb.get(i).get(j));
+//                }
+//            }
+//            for (int i = 0; i < cv.size(); i++) {
+//                for (int j = 0; j < cv.get(i).size(); j++) {
+//                    System.out.print(cv.get(i).get(j) + "   ");
+//                }
+//                System.out.println();
+//            }
+            for (int i = 0; i < luong.size(); i++) {
+                for (int j = 0; j < luong.get(i).size(); j++) {
+                    System.out.print(luong.get(i).get(j) + "   ");
                 }
+                System.out.println();
             }
 
 //            Object[] new_nv = {"nv151", "acc151", "Bui Tuan Anh", "Nam", "2000-11-12", "Phu Xuyen", "cv002", "pb003", null};
