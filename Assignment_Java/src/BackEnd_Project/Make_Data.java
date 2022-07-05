@@ -22,8 +22,8 @@ public class Make_Data {
         String[] usernamePool = new String[150];
         String[] password = new String[150];
         for (int i = 0; i < usernamePool.length; i++) {
-            usernamePool[i] = String.valueOf((i + 1));
-            password[i] = String.valueOf((i + 1));
+            usernamePool[i] = "acc" + String.valueOf((i + 1));
+            password[i] = "password" + String.valueOf((i + 1));
         }
 
         /* Phong Ban table data pool */

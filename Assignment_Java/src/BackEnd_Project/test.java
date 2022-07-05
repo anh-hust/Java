@@ -68,13 +68,17 @@ public class test extends Backend {
 
         try {
             Backend backEnd = new Backend();
-            ArrayList<ArrayList<String>> nv = backEnd.thong_tin_phong_ban("pb001");
+//            ArrayList<ArrayList<String>> pb = backEnd.thong_tin_phong_ban("pb003");
+            ArrayList<ArrayList<String>> nv = backEnd.thong_tin_nhan_vien("nv151");
             for (int i = 0; i < nv.size(); i++) {
                 for (int j = 0; j < nv.get(i).size(); j++) {
                     System.out.println(nv.get(i).get(j));
                 }
             }
 
+//            Object[] new_nv = {"nv151", "acc151", "Bui Tuan Anh", "Nam", "2000-11-12", "Phu Xuyen", "cv002", "pb003", null};
+//            Object[] new_account = {"acc151","password151", 1};
+//            backEnd.them_nhan_vien_moi(new_account, new_nv);
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
