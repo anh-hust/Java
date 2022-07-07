@@ -64,9 +64,9 @@ public class Init_table {
                 "MaPhongBan varchar(20) not null," +
                 "BHXH varchar(20)," +
                 "primary key (MaSoNV)," +
-                "foreign key (MaPhongBan) references PHONGBAN(MaPhongBan)," +
-                "foreign key (username) references ACC(username)," +
-                "foreign key (IDChucVu) references CHUCVU(IDChucVu))");
+                "foreign key (MaPhongBan) references PHONGBAN(MaPhongBan) on update cascade," +
+                "foreign key (username) references ACC(username) on update cascade," +
+                "foreign key (IDChucVu) references CHUCVU(IDChucVu) on update cascade)");
         System.out.println("\n>>THONGTINNV table done !");
 
         /* Bang cham cong */
@@ -76,7 +76,7 @@ public class Init_table {
                 "SoGioLamViec int not null," +
                 "MaSoNV varchar(20) not null," +
                 "primary key(MaCong)," +
-                "foreign key (MaSoNV) references  THONGTINNV(MaSoNV))");
+                "foreign key (MaSoNV) references  THONGTINNV(MaSoNV) on update cascade)");
         System.out.println("\n>>CHAMCONG table done !");
 
         connect.close();
