@@ -8,8 +8,8 @@ public class Make_Data {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         /** Data pool for attributes of tables */
         /* Bang Chuc Vu */
-        String[] idCVpool = {"cv001", "cv002", "cv003", "cv004", "cv005", "cv006", "cv007", "cv008", "cv009",
-                "cv010", "cv011", "cv012", "cv013"};
+        String[] idCVpool = {"cv1", "cv2", "cv3", "cv4", "cv5", "cv6", "cv7", "cv8", "cv9",
+                "cv10", "cv11", "cv12", "cv13"};
         String[] chucVupool = {"DataBase Developer", "Database Administrator", "BackEnd Developer",
                 "FrontEnd Developer", "Tester", "QA", "Business Analyst", "Project Manager", "DevOPS",
                 "Data Engineer", "Network Engineer", "Network Administrator", "IT guy"};
@@ -27,7 +27,7 @@ public class Make_Data {
         }
 
         /* Phong Ban table data pool */
-        String[] idPB = {"pb001", "pb002", "pb003", "pb004"};
+        String[] idPB = {"pb1", "pb2", "pb3", "pb4"};
         String[] tenPhong = {"The One", "The Two", "The Three", "The Four"};
         String[] sdt = {"012345678", "01239876", "0987654321", "0088112756"};
         String[] addrPB = {"D9-300", "D8-001", "D5-011", "C9-110"};

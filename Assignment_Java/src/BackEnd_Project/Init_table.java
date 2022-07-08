@@ -38,7 +38,7 @@ public class Init_table {
 
         /* Bang chuc vu */
         statement.execute("create table CHUCVU(IDChucVu varchar(20) not null," +
-                "ChucVu varchar(30) not null," +
+                "ChucVu varchar(30) not null unique," +
                 "HSLuong float not null," +
                 "Bonus float not null," +
                 "PhuCap float not null," +
@@ -47,7 +47,7 @@ public class Init_table {
 
         /* Bang phong ban */
         statement.execute("create table PHONGBAN(MaPhongBan varchar(20) not null," +
-                "TenPhong varchar(50)," +
+                "TenPhong varchar(50) not null unique," +
                 "DienThoaiPhong varchar(15) not null unique," +
                 "DiaChiPhongBan varchar(50) not null unique," +
                 "primary key (MaPhongBan))");

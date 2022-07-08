@@ -44,15 +44,15 @@ public class Backend {
      * Chuc nang tra cuu, tim kiem thong tin
      */
 
-    public ArrayList<ArrayList<Object>> thong_tin_phong_ban(Object idPhongBan) throws SQLException {
+    public ArrayList<ArrayList<Object>> thong_tin_phong_ban(Object idPhongBan) {
 
-        ArrayList<ArrayList<Object>> phong_ban = new ArrayList<>();
+        ArrayList<ArrayList<Object>> ttpb = new ArrayList<>();
 
         try {
             /* DDL */
             this.preparedStatement = connect.prepareStatement("select * from PHONGBAN where MaPhongBan=?");
 
-            this.preparedStatement.setString(1, (String) idPhongBan);
+            this.preparedStatement.setString(1, idPhongBan.toString());
             ResultSet resultSet = this.preparedStatement.executeQuery();
 
             /* Array to store thong tin phong ban */
@@ -65,19 +65,16 @@ public class Backend {
                 thong_tin_pb.add(resultSet.getString(3));
                 thong_tin_pb.add(resultSet.getString(4));
             }
+            resultSet.close();
 
             /* throw exception if MaPhongBan not exist in database --> array is empty */
             if (thong_tin_pb.isEmpty()) {
-                resultSet.close();
-                throw new ValueNotAvailableInDatabase("ID Phong Ban doesn't exist !");
+                throw new ValueNotAvailableInDatabase();
             } else {
-                this.preparedStatement.clearParameters();
-                resultSet.close();
-
                 this.preparedStatement = connect.prepareStatement("select MaSoNV, username, HoTen " +
                         "from THONGTINNV inner join PHONGBAN on THONGTINNV.MaPhongBan=PHONGBAN.MaPhongBan " +
                         "where THONGTINNV.MaPhongBan=?");
-                this.preparedStatement.setString(1, (String) idPhongBan);
+                this.preparedStatement.setString(1, idPhongBan.toString());
                 ResultSet resultSet1 = this.preparedStatement.executeQuery();
 
                 /* Array to store column by column from data in database */
@@ -91,21 +88,25 @@ public class Backend {
                     hoten_nv_thuoc_phong_ban.add(resultSet1.getString(3));
                 }
 
-                phong_ban.add(thong_tin_pb);
-                phong_ban.add(ms_nv_thuoc_phong_ban);
-                phong_ban.add(username_nv_thuoc_phong_ban);
-                phong_ban.add(hoten_nv_thuoc_phong_ban);
+                ttpb.add(thong_tin_pb);
+                ttpb.add(ms_nv_thuoc_phong_ban);
+                ttpb.add(username_nv_thuoc_phong_ban);
+                ttpb.add(hoten_nv_thuoc_phong_ban);
 
                 resultSet1.close();
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("!! Query Error !!");
+            ttpb.add(errMessage);
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("Ma So Phong Ban does not exist !!");
+            ttpb.add(errMessage);
         }
 
-        return phong_ban;
+        return ttpb;
     }
 
     public ArrayList<ArrayList<Object>> thong_tin_nhan_vien(Object input /* username or HoTen or MaSoNV */) {
@@ -116,7 +117,8 @@ public class Backend {
             /* DDL */
             this.preparedStatement = connect.prepareStatement("select * from THONGTINNV where ? in(MaSoNV, HoTen, username)");
 
-            preparedStatement.setString(1, (String) input);
+            preparedStatement.setString(1, input.toString());
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             /* Array to store each column from database queried */
@@ -143,10 +145,11 @@ public class Backend {
                 bhxh.add(resultSet.getString(9));
             }
 
+            resultSet.close();
+
             /* Throw exception if Nhan Vien not available in database */
             if (msnv.isEmpty()) {
-                resultSet.close();
-                throw new ValueNotAvailableInDatabase("Nhan Vien doesn't exist !");
+                throw new ValueNotAvailableInDatabase();
             } else {
                 ttnv.add(msnv);
                 ttnv.add(username);
@@ -160,10 +163,15 @@ public class Backend {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("!! Query Error !!");
+            ttnv.add(errMessage);
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("Nhan Vien does not exist !!");
+            ttnv.add(errMessage);
         }
+
         return ttnv;
     }
 
@@ -173,10 +181,12 @@ public class Backend {
 
         try {
             /* DDL */
-            this.preparedStatement = connect.prepareStatement("select THONGTINNV.IDChucVu, THONGTINNV.MaSoNV, THONGTINNV.HoTen, THONGTINNV.MaPhongBan, PHONGBAN.TenPhong, PHONGBAN.DienThoaiPhong, PHONGBAN.DiaChiPhongBan" +
+            this.preparedStatement = connect.prepareStatement("select THONGTINNV.IDChucVu, THONGTINNV.MaSoNV, THONGTINNV.HoTen, " +
+                    "THONGTINNV.MaPhongBan, PHONGBAN.TenPhong, PHONGBAN.DienThoaiPhong, PHONGBAN.DiaChiPhongBan" +
                     " from THONGTINNV inner join PHONGBAN on THONGTINNV.MaPhongBan=PHONGBAN.MaPhongBan where THONGTINNV.IDChucVu=?");
 
-            preparedStatement.setString(1, (String) idChucVu);
+            preparedStatement.setString(1, idChucVu.toString());
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             ArrayList<Object> idchucvu = new ArrayList<>();
@@ -197,9 +207,10 @@ public class Backend {
                 addr.add(resultSet.getString(7));
             }
 
+            resultSet.close();
+
             if (idchucvu.isEmpty()) {
-                resultSet.close();
-                throw new ValueNotAvailableInDatabase("ID Chuc Vu doesn't exist !");
+                throw new ValueNotAvailableInDatabase();
             } else {
                 ttcv.add(idchucvu);
                 ttcv.add(msnv);
@@ -211,9 +222,13 @@ public class Backend {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("!! Query Error !!");
+            ttcv.add(errMessage);
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("Chuc Vu does not exist !!");
+            ttcv.add(errMessage);
         }
         return ttcv;
     }
@@ -230,7 +245,8 @@ public class Backend {
                     " inner join CHUCVU on THONGTINNV.IDChucVu=CHUCVU.IDChucVu" +
                     " where ? in (CHAMCONG.MaCong, CHAMCONG.MaSoNV)");
 
-            preparedStatement.setString(1, (String) input);
+            preparedStatement.setString(1, input.toString());
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             ArrayList<Object> msnv = new ArrayList<>();
@@ -253,9 +269,10 @@ public class Backend {
                 phucap.add(resultSet.getFloat(8));
             }
 
+            resultSet.close();
+
             if (msnv.isEmpty()) {
-                resultSet.close();
-                throw new ValueNotAvailableInDatabase("ID Nhan Vien or Ma Cong doesn't exist !");
+                throw new ValueNotAvailableInDatabase();
             } else {
                 ttl.add(msnv);
                 ttl.add(mc);
@@ -268,10 +285,15 @@ public class Backend {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("!! Query Error !!");
+            ttl.add(errMessage);
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            ArrayList<Object> errMessage = new ArrayList<>();
+            errMessage.add("Ma Cong or Ma So Nhan Vien does not exist !!");
+            ttl.add(errMessage);
         }
+
         return ttl;
     }
 
@@ -279,32 +301,61 @@ public class Backend {
      * Chuc nang sua doi, chinh sua databases
      */
 
+    /**
+     * suppose that front-end restricts staff must enter Ho ten into text filed or whatever to take input parameter for these functions
+     * */
+
+    /* a support function, not available in front end */
+    public void xoa_tai_khoan(Object username, Object password) {
+        try {
+            this.preparedStatement = connect.prepareStatement("delete from ACC where username=?");
+            this.preparedStatement.setString(1, (String) username);
+            this.preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+    }
+
     public Object dang_nhap(Object username, Object password) {
+
         Object quyen = null;
+
         try {
             this.preparedStatement = this.connect.prepareStatement("select * from ACC where username=?");
 
             this.preparedStatement.setString(1, (String) username);
             ResultSet resultSet = this.preparedStatement.executeQuery();
 
-            String user = "";
-            String pass = "";
+            String current_username = "";
+            String current_password = "";
 
 
             while (resultSet.next()) {
-                user = resultSet.getString(1);
-                pass = resultSet.getString(2);
+                current_username = resultSet.getString(1);
+                current_password = resultSet.getString(2);
                 quyen = resultSet.getInt(3);
             }
 
+            resultSet.close();
+
+            if (current_username.isEmpty())
+                throw new ValueNotAvailableInDatabase();
+
+            if (!current_password.equals(password.toString()))
+                throw new VerifyFail();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "!! Query Error !!";
+        } catch (ValueNotAvailableInDatabase e) {
+            return "Username does not exist !!";
+        } catch (VerifyFail e) {
+            return "Password is wrong !!";
         }
+
         return quyen;
     }
 
-    public void sua_tai_khoan(Object old_username, Object old_password, Object new_username, Object new_password) {
+    public Object sua_tai_khoan(Object old_username, Object old_password, Object new_username, Object new_password) {
         try {
             /* Verify old username and password before change */
             this.preparedStatement = this.connect.prepareStatement("select username, password from ACC where username=?");
@@ -312,23 +363,21 @@ public class Backend {
             this.preparedStatement.setString(1, (String) old_username);
             ResultSet resultSet = this.preparedStatement.executeQuery();
 
-            String username = "";
-            String pass = "";
+            String current_username = "";
+            String current_password = "";
 
             while (resultSet.next()) {
-                username = resultSet.getString(1);
-                pass = resultSet.getString(2);
+                current_username = resultSet.getString(1);
+                current_password = resultSet.getString(2);
             }
 
-            if (username.isEmpty()) {
-                throw new ValueNotAvailableInDatabase("username doesn't exist !!!");
-            } else if (!pass.equals((String) old_password)) {
-                System.out.println("Verify fail: Wrong password !!!");
-                resultSet.close();
-                return;
+            resultSet.close();
 
+            if (current_username.isEmpty()) {
+                throw new ValueNotAvailableInDatabase();
+            } else if (!current_password.equals(old_password.toString())) {
+                throw new VerifyFail();
             } else {
-                resultSet.close();
                 this.preparedStatement = this.connect.prepareStatement("update ACC " +
                         "set username=?, password=? where username=?");
 
@@ -340,28 +389,33 @@ public class Backend {
             }
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("Error: New username already exist !!!");
+            return "New username already exist !!!";
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            return "Username does not exist !!";
+        } catch (VerifyFail e) {
+            return "Password is wrong";
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "!! Query & Update Error !!";
         }
+        return "Successful";
     }
 
-    public void sua_thong_tin_nhan_vien_staff(Object maSoNhanVien, Object Hoten, Object gender, Object ngaySinh, Object address, Object BHXH) {
+    public Object sua_thong_tin_nhan_vien_staff(Object maSoNhanVien, Object Hoten, Object gender, Object ngaySinh, Object address, Object BHXH) {
         try {
             /* check if Ma So NV exist in database */
             this.preparedStatement = this.connect.prepareStatement("select MaSoNV from THONGTINNV where MaSoNV=?");
 
-            this.preparedStatement.setString(1, (String) maSoNhanVien);
+            this.preparedStatement.setString(1, maSoNhanVien.toString());
             ResultSet resultSet = this.preparedStatement.executeQuery();
 
-            String tmp = "";
+            String current_msnv = "";
             while (resultSet.next())
-                tmp = resultSet.getString(1);
+                current_msnv = resultSet.getString(1);
 
-            if (tmp.isEmpty())
-                throw new ValueNotAvailableInDatabase("Ma So Nhan Vien doesn't exist in database !!!");
+            resultSet.close();
+
+            if (current_msnv.isEmpty())
+                throw new ValueNotAvailableInDatabase();
             else {
                 this.preparedStatement = connect.prepareStatement("update THONGTINNV " +
                         "set HoTen=?," +
@@ -371,30 +425,29 @@ public class Backend {
                         "BHXH=? " +
                         "where MaSoNV=?");
 
-                this.preparedStatement.setString(1, (String) Hoten);
-                this.preparedStatement.setString(2, (String) gender);
-                this.preparedStatement.setString(3, (String) ngaySinh);
-                this.preparedStatement.setString(4, (String) address);
-                this.preparedStatement.setString(5, (String) BHXH);
-                this.preparedStatement.setString(6, (String) maSoNhanVien);
+                this.preparedStatement.setString(1, Hoten.toString());
+                this.preparedStatement.setString(2, gender.toString());
+                this.preparedStatement.setString(3, ngaySinh.toString());
+                this.preparedStatement.setString(4, address.toString());
+                this.preparedStatement.setString(5, BHXH.toString());
+                this.preparedStatement.setString(6, maSoNhanVien.toString());
 
                 this.preparedStatement.executeUpdate();
             }
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("Ho Ten cann't be null !!!");
+            return "Nhan Vien does not exist !!";
         } catch (MysqlDataTruncation e) {
-            System.out.println("Ngay Sinh is in the wrong format .Format is YYYY-MM-DD !!!");
+            return "Ngay Sinh is in the wrong format .Format is YYYY-MM-DD !!!";
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "!! Query & Update Error !!";
         }
+        return "Successful";
     }
 
     /**
      * only for database admin
      */
-    public void them_nhan_vien_moi(Object[] account_nv_moi, Object[] nhan_vien_moi) {
+    public Object them_nhan_vien_moi(Object[] account_nv_moi, Object[] nhan_vien_moi) {
         /* insert ACC first */
         try {
             this.preparedStatement = connect.prepareStatement("insert into ACC values(?,?,?)");
@@ -404,12 +457,14 @@ public class Backend {
             this.preparedStatement.setInt(3, (Integer) account_nv_moi[2]);
 
             this.preparedStatement.executeUpdate();
+
         } catch (SQLIntegrityConstraintViolationException ex) {
-            System.out.println("username already exist !!!");
-            return;
+            return "Username already exist !!";
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "!! Update Error !!";
         }
+
+        /* insert TTNV */
         try {
             this.preparedStatement = connect.prepareStatement("insert into THONGTINNV values(?,?,?,?,?,?,?,?,?)");
             for (int i = 0; i < nhan_vien_moi.length; i++) {
@@ -418,21 +473,22 @@ public class Backend {
                 else
                     this.preparedStatement.setString(i + 1, nhan_vien_moi[i].toString());
             }
+
             this.preparedStatement.executeUpdate();
+
+            /* any error --> delete account is just created */
+        } catch (SQLIntegrityConstraintViolationException e) {
+            xoa_tai_khoan(account_nv_moi[0], account_nv_moi[1]);
+            return "Ma So Nhan Vien Or Username already exists !!!" +
+                    "\nOr ID Chuc Vu and Ma Phong Ban doesn't exist !!";
         } catch (SQLException e) {
-            /* if insert Nhan Vien error after insert ACC successfully --> delete account is just created */
-            try {
-                this.preparedStatement = connect.prepareStatement("delete from ACC where username=?");
-                this.preparedStatement.setString(1, (String) account_nv_moi[0]);
-                this.preparedStatement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-            throw new RuntimeException(e);
+            xoa_tai_khoan(account_nv_moi[0], account_nv_moi[1]);
+            return "!! Update Error !!";
         }
+        return "Successful";
     }
 
-    public void sua_thong_tin_nhan_vien_admin(Object MaSoNV, Object IDChucVu_new, Object MaPhongBan_new) {
+    public Object sua_thong_tin_nhan_vien_admin(Object MaSoNV, Object IDChucVu_new, Object MaPhongBan_new) {
         try {
             /* check if Ma So NV not in database */
             this.preparedStatement = this.connect.prepareStatement("select MaSoNV from THONGTINNV where MaSoNV=?");
@@ -440,12 +496,12 @@ public class Backend {
             this.preparedStatement.setString(1, (String) MaSoNV);
             ResultSet resultSet = this.preparedStatement.executeQuery();
 
-            String tmp = "";
+            String msnv = "";
             while (resultSet.next())
-                tmp = resultSet.getString(1);
+                msnv = resultSet.getString(1);
 
-            if (tmp.isEmpty())
-                throw new ValueNotAvailableInDatabase("Ma So Nhan Vien dowsn't exist in database !!!");
+            if (msnv.isEmpty())
+                throw new ValueNotAvailableInDatabase();
             else {
                 this.preparedStatement = this.connect.prepareStatement("update THONGTINNV " +
                         "set IDChucVu=?," +
@@ -455,15 +511,131 @@ public class Backend {
                 this.preparedStatement.setString(1, (String) IDChucVu_new);
                 this.preparedStatement.setString(2, (String) MaPhongBan_new);
                 this.preparedStatement.setString(3, (String) MaSoNV);
+
                 this.preparedStatement.executeUpdate();
             }
         } catch (ValueNotAvailableInDatabase e) {
-            System.out.println(e);
+            return "Ma So Nhan Vien already exists !!";
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("ID Chuc Vu or Ma Phong Ban doesn't exist !!!");
+            return "ID Chuc Vu or Ma Phong Ban doesn't exist !!!";
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return "!! Update Error !!";
         }
+        return "Successful";
 
+    }
+
+    public Object cham_cong_theo_thang(Object thang, Object maSoNV, int soNgayLV, int soGioLV) {
+        try {
+            /* take the count of Ma Cong to gen a new Ma COng */
+            int count = 0;
+            ResultSet resultSet = this.statement.executeQuery("select count(*) from CHAMCONG");
+            while (resultSet.next())
+                count = resultSet.getInt(1);
+
+            resultSet.close();
+
+            /* check if the staff already has salary for this month */
+            this.preparedStatement = this.connect.prepareStatement("select Thang, MaSoNV from CHAMCONG where Thang=?");
+
+            this.preparedStatement.setString(1, thang.toString());
+
+            ResultSet resultSet1 = this.preparedStatement.executeQuery();
+
+            String month = "";
+            String msnv = "";
+
+            while (resultSet1.next()) {
+                month = resultSet1.getString(1);
+                msnv = resultSet1.getString(2);
+            }
+
+            resultSet.close();
+
+            if(msnv.isEmpty())
+                throw new ValueNotAvailableInDatabase();
+
+            if (month.equals(thang.toString()) && msnv.equals(maSoNV.toString()))
+                throw new TwiceAMonth();
+
+            /* Cham Cong */
+            this.preparedStatement = connect.prepareStatement("insert into CHAMCONG values(?,?,?,?,?)");
+
+            this.preparedStatement.setString(1, ("cc" + String.valueOf(count + 1)));
+            this.preparedStatement.setString(2, (String) thang);
+            this.preparedStatement.setInt(3, soNgayLV);
+            this.preparedStatement.setInt(4, soGioLV);
+            this.preparedStatement.setString(5, (String) maSoNV);
+
+            this.preparedStatement.executeUpdate();
+
+        } catch (ValueNotAvailableInDatabase e) {
+            return "Ma So Nhan Vien doesn't exist !!";
+        } catch (SQLException e) {
+            return "!! Update error !!";
+        } catch (TwiceAMonth e) {
+            return "This staff already has salary for " + String.valueOf(thang);
+        }
+        return "Successful";
+    }
+
+    public Object them_phong_ban(Object tenPhong, Object sdt, Object diaChi) {
+        try {
+            /* count row to gen the next Ma Phong Ban */
+            int count = 0;
+            ResultSet resultSet = this.statement.executeQuery("select count(*) from PHONGBAN");
+
+            while (resultSet.next())
+                count = resultSet.getInt(1);
+
+            resultSet.close();
+
+            this.preparedStatement = this.connect.prepareStatement("insert into PHONGBAN values(?,?,?,?)");
+
+            this.preparedStatement.setString(1, "pb" + String.valueOf(count + 1));
+            this.preparedStatement.setString(2, (String) tenPhong);
+            this.preparedStatement.setString(3, (String) sdt);
+            this.preparedStatement.setString(4, (String) diaChi);
+
+            this.preparedStatement.executeUpdate();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return "Ten Phong Ban, SDT and Dia Chi Phong Ban can not be duplicated !!";
+        } catch (SQLException e) {
+            return "!! Update Error !!";
+        }
+        return "Successful";
+    }
+
+    public Object them_chuc_vu(Object tenChucVU, double hsLuong, double Bonus, double phuCap) {
+        try {
+            if (hsLuong == 0)
+                return "He So Luong cannot equal 0 !!";
+
+            /* count to gen new ID Chuc Vu */
+            int count = 0;
+            ResultSet resultSet = this.statement.executeQuery("select count(*) from CHUCVU");
+            while (resultSet.next())
+                count = resultSet.getInt(1);
+
+            resultSet.close();
+
+            /* insert new Chuc vu */
+            this.preparedStatement = connect.prepareStatement("insert into CHUCVU values(?,?,?,?,?)");
+
+            this.preparedStatement.setString(1, ("cv" + String.valueOf(count + 1)));
+            this.preparedStatement.setString(2, tenChucVU.toString());
+            this.preparedStatement.setDouble(3, hsLuong);
+            this.preparedStatement.setDouble(4, Bonus);
+            this.preparedStatement.setDouble(5, phuCap);
+
+            this.preparedStatement.executeUpdate();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return "Ten Chuc Vu already exists !!";
+        } catch (SQLException e) {
+            return "!! Update Error !!";
+        }
+        return "Successful";
     }
 }
