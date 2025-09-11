@@ -1,5 +1,5 @@
 # Java
-Assignment Java each week and Major Asignment-Backend
+Weekly assignment and Major project
 
  Subject: Advanced Programming
 
